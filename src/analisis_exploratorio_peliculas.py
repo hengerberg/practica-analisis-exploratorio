@@ -4,7 +4,7 @@ import seaborn as sns
 
 url = 'https://raw.githubusercontent.com/justmarkham/pandas-videos/master/data/imdb_1000.csv'
 df = pd.read_csv(url)
-print(df.head())
+#print(df.head())
 # agregamos una nueva columna de la duracion en minutos
 df["duration_hours"] = pd.to_datetime(df["duration"], unit="m")
 
@@ -35,7 +35,6 @@ column_duration = df["duration"]
 
 # creamos un diagrama de caja y bigotes y comprobamos los valores atipicos
 plt.figure(figsize=(10,6))
-
 plt.subplot(1,2,1) # 1 fila, 2 columnas primer subplot
 sns.boxplot(y=df["duration"])
 plt.title("Box plots - Con Outliers")
@@ -65,6 +64,22 @@ sns.boxplot(y=df_sin_outliers["duration"])
 plt.title("Box Plots - Sin Outliers")
 plt.xlabel("Duracion")
 plt.ylabel("Minutos")
-
 plt.tight_layout() # ajusta los subplots para evitar superposiciones
-#plt.show()
+
+# creamos un diagrama de dispersion generado por la siguiente hipotesis:
+# mayor duracion mejor rating
+
+plt.figure(figsize=(10,6))
+plt.subplot()
+sns.scatterplot(x = df_sin_outliers["star_rating"], y = df_sin_outliers["duration"])
+# concluimos que la duracion no tiene una ralacion clara sobre el rating
+
+# creamos un df con las columnas numericas para crear una correlacion entre ellas
+df_corr = df_sin_outliers[["star_rating","duration"]]
+corr = df_corr.corr() #creamos la correlacion 
+plt.figure(figsize=(10,6))
+plt.subplot()
+sns.heatmap(corr) # graficamos la correlacion en un mapa de calor
+
+
+plt.show()
