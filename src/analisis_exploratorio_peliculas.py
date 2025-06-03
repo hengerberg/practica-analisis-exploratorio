@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import ast
 
 url = 'https://raw.githubusercontent.com/justmarkham/pandas-videos/master/data/imdb_1000.csv'
 df = pd.read_csv(url)
@@ -74,12 +75,28 @@ plt.subplot()
 sns.scatterplot(x = df_sin_outliers["star_rating"], y = df_sin_outliers["duration"])
 # concluimos que la duracion no tiene una ralacion clara sobre el rating
 
-# creamos un df con las columnas numericas para crear una correlacion entre ellas
-df_corr = df_sin_outliers[["star_rating","duration"]]
-corr = df_corr.corr() #creamos la correlacion 
-plt.figure(figsize=(10,6))
-plt.subplot()
-sns.heatmap(corr) # graficamos la correlacion en un mapa de calor
+#plt.show()
 
+# agrupamos en un df los generos y sacamos el promedio de rating por cada genero
+# y ordenamos el df agrapado para mostrar claramente que genero tiene un mejor rating
+df_genre_rating = df.groupby("genre")["star_rating"].mean().sort_values(ascending=False)
 
-plt.show()
+# los generos que tienen mayores rating son: Western 8.255556, Film-Noir 8.033333, History 8.000000
+
+df['actors_list'] = df['actors_list'].apply(ast.literal_eval) # convertimos las cademas a objetos tipo lista
+df_exploded = df.explode('actors_list') # creamos un df con una fila por actor
+
+actor_counts = df_exploded['actors_list'].value_counts() # contamos la cantidad de peliculas por actor
+
+# analizamos el promedio de rating por actor
+actor_rating = df_exploded.groupby('actors_list')['star_rating'].mean().sort_values(ascending=False)
+
+# creamos un nuevo df con la cantidad de peliculas por actor y su promedio de rating, y renombramos las columas
+actor_summary = df_exploded.groupby('actors_list').agg({
+    'title': 'count',
+    'star_rating': 'mean'
+}).rename(columns={'title': 'movie_count', 'star_rating': 'avg_rating'})
+
+# Filtrar actores con al menos 5 películas y ordenar por rating
+top_actors = actor_summary[actor_summary['movie_count'] >= 5].sort_values(by='avg_rating', ascending=False)
+print(top_actors.head(10))
