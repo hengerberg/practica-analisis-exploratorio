@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import ast
 
-url = 'https://raw.githubusercontent.com/justmarkham/pandas-videos/master/data/imdb_1000.csv'
-df = pd.read_csv(url)
+
+df = pd.read_csv("data\data.csv")
 
 # agregamos una nueva columna de la duracion en minutos
 df["duration_hours"] = pd.to_datetime(df["duration"], unit="m")
